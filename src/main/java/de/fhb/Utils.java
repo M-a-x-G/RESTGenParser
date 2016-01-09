@@ -8,14 +8,17 @@ public final class Utils {
 
     private final String ROOT_PATH;
     private final String PACKAGE_PATH;
+    private final String WORKDIR;
 
-    public Utils(String rootPath, String packagePath) {
-        ROOT_PATH = rootPath;
-        PACKAGE_PATH = ROOT_PATH +packagePath;
+    public Utils(String rootPath, String packagePath, String workdir) {
+        WORKDIR = workdir;
+        ROOT_PATH = workdir + rootPath;
+        PACKAGE_PATH = ROOT_PATH + packagePath;
+
     }
 
     public Map<FileType, File> getfileFolderPaths() {
-       return new HashMap<FileType, File>() {{
+        return new HashMap<FileType, File>() {{
             put(FileType.DTO, new File(PACKAGE_PATH + "dto"));
             put(FileType.APPLICATION_PROPERTIES, new File(ROOT_PATH + "resources"));
             put(FileType.MODEL, new File(PACKAGE_PATH + "model"));
@@ -24,7 +27,12 @@ public final class Utils {
             put(FileType.REPOSITORY, new File(PACKAGE_PATH + "repository"));
             put(FileType.CONTROLLER, new File(PACKAGE_PATH + "controller"));
             put(FileType.MAIN_CLASS, new File(PACKAGE_PATH));
+            put(FileType.BUILD_SETTINGS, new File(WORKDIR));
         }};
+    }
+
+    public String getWORKDIR() {
+        return WORKDIR;
     }
 
     public String getROOT_PATH() {
