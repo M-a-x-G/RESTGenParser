@@ -1,6 +1,7 @@
 package de.fhb;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.output.FileWriterWithEncoding;
 
 import java.io.BufferedReader;
@@ -15,7 +16,7 @@ import java.util.Map;
 public class Generator {
     public static void main(String[] args) {
         Utils utils = new Utils("src/main/", "de/fhb/java/", "project/");
-        Map<FileType, File> fileFolderPaths = utils.getfileFolderPaths();
+        Map<FileType, FolderPackage> fileMetaData = utils.getGetFileMetaData();
         File tmpFile = new File("all.tmp");
         BufferedReader bufferedReader;
         BufferedWriter bufferedWriter = null;
@@ -29,10 +30,15 @@ public class Generator {
                         bufferedWriter.flush();
                     }
                     String[] meta = line.substring(2).split(":");
-                    File actualFolder = fileFolderPaths.get(FileType.byString(meta[1]));
+                    FolderPackage folderPackage = fileMetaData.get(FileType.byString(meta[1]));
+                    File actualFolder = folderPackage.getFolder();
                     FileUtils.forceMkdir(actualFolder);
                     actualFile = new File(actualFolder, meta[0]);
                     bufferedWriter = new BufferedWriter(new FileWriterWithEncoding(actualFile, Charset.forName("UTF8")));
+                    if(FilenameUtils.getExtension(meta[0]).equals("java")){
+                        bufferedWriter.write("package "+ folderPackage.getPackageName()+";");
+                        bufferedWriter.newLine();
+                    }
                     continue;
                 }
                 if (actualFile == null && bufferedWriter == null) {
@@ -42,6 +48,10 @@ public class Generator {
                 bufferedWriter.write(line);
 
             }
+            if (bufferedWriter != null){
+                bufferedWriter.flush();
+            }
+            utils.createMainClass();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
