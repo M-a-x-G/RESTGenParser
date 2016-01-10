@@ -1,7 +1,6 @@
 package de.fhb;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.output.FileWriterWithEncoding;
 
 import java.io.BufferedReader;
@@ -15,8 +14,8 @@ import java.util.Map;
 
 public class Generator {
     public static void main(String[] args) {
-        Utils utils = new Utils("src/main/", "de/fhb/java/", "project/");
-        Map<FileType, FolderPackage> fileMetaData = utils.getGetFileMetaData();
+        Utils utils;
+        Map<FileType, FolderPackage> fileMetaData;
         File tmpFile = new File("all.tmp");
         BufferedReader bufferedReader;
         BufferedWriter bufferedWriter = null;
@@ -24,9 +23,16 @@ public class Generator {
             bufferedReader = new BufferedReader(new FileReader(tmpFile));
             String line;
             File actualFile = null;
+            if ((line = bufferedReader.readLine()) != null && !line.isEmpty() && line.charAt(0) == '∑') {
+                String meta = line.substring(2);
+                utils = new Utils("src/main/java/", meta, "project/");
+                fileMetaData = utils.getFileMetaData();
+            } else {
+                throw new IOException("Illegal file format. Can't parse start meta data correctly.");
+            }
             while ((line = bufferedReader.readLine()) != null) {
                 if (!line.isEmpty() && line.charAt(0) == '√') {
-                    if (bufferedWriter != null){
+                    if (bufferedWriter != null) {
                         bufferedWriter.flush();
                     }
                     String[] meta = line.substring(2).split(":");
@@ -34,29 +40,25 @@ public class Generator {
                     File actualFolder = folderPackage.getFolder();
                     FileUtils.forceMkdir(actualFolder);
                     actualFile = new File(actualFolder, meta[0]);
-                    bufferedWriter = new BufferedWriter(new FileWriterWithEncoding(actualFile, Charset.forName("UTF8")));
-                    if(FilenameUtils.getExtension(meta[0]).equals("java")){
-                        bufferedWriter.write("package "+ folderPackage.getPackageName()+";");
-                        bufferedWriter.newLine();
-                    }
+                    bufferedWriter = new BufferedWriter(new FileWriterWithEncoding(actualFile, Charset.forName("UTF-8")));
                     continue;
                 }
                 if (actualFile == null && bufferedWriter == null) {
                     throw new IOException("Illegal file format. Can't parse meta data correctly.");
                 }
-                bufferedWriter.newLine();
                 bufferedWriter.write(line);
+                bufferedWriter.newLine();
 
             }
-            if (bufferedWriter != null){
+            if (bufferedWriter != null) {
                 bufferedWriter.flush();
             }
             utils.createMainClass();
+            utils.createDataSourceConfiguration();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
 }
