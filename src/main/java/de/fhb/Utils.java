@@ -36,6 +36,7 @@ public final class Utils {
             put(FileType.CONTROLLER, rootPackage.withAdded("controller"));
             put(FileType.MAIN_CLASS, rootPackage);
             put(FileType.BUILD_SETTINGS, new FolderPackage(workDir + "/.", ""));
+            put(FileType.DTO_MAPPER, rootPackage.withAdded("util"));
         }};
     }
 
@@ -54,11 +55,11 @@ public final class Utils {
                 "\n" +
                 "    @Override\n" +
                 "    protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {\n" +
-                "        return application.sources(CampusAppEvalBackendApplication.class);\n" +
+                "        return application.sources(Application.class);\n" +
                 "    }\n" +
                 "\n" +
                 "    public static void main(String[] args) {\n" +
-                "        SpringApplication.run(CampusAppEvalBackendApplication.class, args);\n" +
+                "        SpringApplication.run(Application.class, args);\n" +
                 "    }\n" +
                 "}";
         bufferedWriter.write(content);
