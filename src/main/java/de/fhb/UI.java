@@ -3,7 +3,6 @@ package de.fhb;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.output.FileWriterWithEncoding;
 
-import java.awt.Desktop;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -18,6 +17,7 @@ import java.util.logging.Logger;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
@@ -49,9 +49,9 @@ public class UI extends Application {
                     if (file != null) {
                         inputLabel.setText(file.getAbsolutePath());
                         inputOutputFile[0] = file;
-                        if (inputOutputFile[1] != null){
+                        if (inputOutputFile[1] != null) {
                             generateButton.setDisable(false);
-                        }else{
+                        } else {
                             generateButton.setDisable(true);
                         }
                     }
@@ -63,9 +63,9 @@ public class UI extends Application {
                     if (file != null) {
                         outputLabel.setText(file.getAbsolutePath());
                         inputOutputFile[1] = file;
-                        if (inputOutputFile[0] != null){
+                        if (inputOutputFile[0] != null) {
                             generateButton.setDisable(false);
-                        }else{
+                        } else {
                             generateButton.setDisable(true);
                         }
                     }
@@ -73,6 +73,12 @@ public class UI extends Application {
 
         generateButton.setOnAction(event -> {
             generate(inputOutputFile[0], inputOutputFile[1]);
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Success");
+            alert.setHeaderText(null);
+            alert.setContentText("Generation Successful!");
+
+            alert.showAndWait();
         });
 
 
@@ -101,17 +107,26 @@ public class UI extends Application {
         Application.launch(args);
     }
 
+    /**
+     * configuration filter for the file chooser
+     * @param fileChooser
+     */
     private static void configureFileChooserForTmp(
             final FileChooser fileChooser) {
         fileChooser.setTitle("Select all.tmp");
         fileChooser.setInitialDirectory(
-                new File(System.getProperty("user.home"))
+                new File(System.getProperty("user.home")+"/Documents/Semester Docs/3. SemesterM/MSE/Project/solutions/TestSolution/source_gen/de/fhb/TestSolution/run")
         );
         fileChooser.getExtensionFilters().addAll(
                 new FileChooser.ExtensionFilter("all.tmp", "all.tmp")
         );
     }
 
+    /**
+     * Generates the spring project from MPS output
+     * @param tmpFile path to mps output file
+     * @param output folder for project
+     */
     private void generate(File tmpFile, File output) {
         Utils utils;
         Map<FileType, FolderPackage> fileMetaData;
@@ -123,7 +138,7 @@ public class UI extends Application {
             File actualFile = null;
             if ((line = bufferedReader.readLine()) != null && !line.isEmpty() && line.charAt(0) == '∑') {
                 String meta = line.substring(2);
-                utils = new Utils("src/main/java/", meta, output.getAbsolutePath());
+                utils = new Utils("src/main/java/", meta, output.getAbsolutePath() + "/");
                 fileMetaData = utils.getFileMetaData();
             } else {
                 throw new IOException("Illegal file format. Can't parse start meta data correctly.");
