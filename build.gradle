@@ -1,12 +1,24 @@
+
+buildscript {
+    dependencies {
+        classpath group: 'de.dynamicfiles.projects.gradle.plugins', name: 'javafx-gradle-plugin', version: '1.1'
+    }
+
+    repositories {
+        mavenCentral()
+    }
+}
+
 group 'de.fhb'
 version '1.0-SNAPSHOT'
 
 apply plugin: 'java'
 apply plugin: 'application'
+apply plugin: 'javafx-gradle-plugin'
 
 sourceCompatibility = 1.8
 version = 1.0
-mainClassName = "de.fhb.Generator"
+mainClassName = "de.fhb.UI"
 
 repositories {
     mavenCentral()
@@ -25,4 +37,17 @@ jar {
 dependencies {
     compile 'commons-io:commons-io:2.4'
 
+}
+jfx {
+    mainClass = mainClassName
+    appName = 'RESTGenParser'
+    jfxMainAppJarName = 'RESTGenParser.jar'
+    vendor = "Blackarrow"
+    bundleArguments = [
+            // dont bundle JRE (not recommended, but increases build-size/-speed)
+            runtime: null
+    ]
+    // to only use ONE bundler, you can specify it by name
+    // bundler= "windows.app"
+//    secondaryLaunchers = [[appName:"somethingDifferent"], [appName:"somethingDifferent2"]]
 }
